@@ -8,12 +8,11 @@ ADMIN_PASSWORD: Final[str] = os.getenv('PASSWORD')
 
 
 def login(password: str):
-    print(password)
-    resp = make_response()
+    resp = make_response({'message': 'OK'}, 202)
     if password == ADMIN_PASSWORD:
         session_id = str(uuid.uuid4())
         resp.set_cookie('session_id', session_id)
-        session['ADMIN'] = session_id
+        session[session_id] = session_id
         return resp
     else:
         return False

@@ -2,10 +2,12 @@ import os
 
 from flask import Flask
 from dotenv import load_dotenv
-from Service.authentication import login, logout
 from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+
+from Service.authentication import login, logout
+from Middleware.middleware import authentication_middleware
 
 # Initiating app
 app = Flask(__name__)
@@ -28,7 +30,7 @@ def LOGIN():
     if not response:
         return {'message': 'NOT ALLOWED'}, 401
     else:
-        return response, 202
+        return response
 
 
 @app.route('/logout', methods=['POST'])
@@ -42,6 +44,7 @@ def LOG_OUT():
 # optional:
 # system: string
 @app.route('/container/create', methods=['POST'])
+@authentication_middleware
 def POST_CREATE_CONTAINER():
     return {'message': 'NOT IMPLEMENTED'}, 501
 
@@ -49,30 +52,35 @@ def POST_CREATE_CONTAINER():
 ## Check status
 # id -> container id
 @app.route('/container/status/<string:id>', methods=['GET'])
+@authentication_middleware
 def GET_STATUS(id):
     return {'message': 'NOT IMPLEMENTED'}, 501
 
 
 ## Get all container info
 @app.route('/container/all', methods=['GET'])
+@authentication_middleware
 def GET_ALL():
     return {'message': 'NOT IMPLEMENTED'}, 501
 
 
 ## Turn container on
 @app.route('/container/on/<string:id>', methods=['POST'])
+@authentication_middleware
 def POST_TURN_ON(id):
     return {'message': 'NOT IMPLEMENTED'}, 501
 
 
 ## Turn off
 @app.route('/container/off/<string:id>', methods=['POST'])
+@authentication_middleware
 def POST_TURN_OFF(id):
     return {'message': 'NOT IMPLEMENTED'}, 501
 
 
 ## Change "always on" status
 @app.route('/container/always_on/<string:id>', methods=['POST'])
+@authentication_middleware
 def POST_ALWAYS_ON(id):
     return {'message': 'NOT IMPLEMENTED'}, 501
 
