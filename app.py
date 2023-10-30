@@ -1,9 +1,11 @@
 import os
 
-from flask import Flask, request, make_response
+from flask import Flask
 from dotenv import load_dotenv
 from Service.authentication import login, logout
 from flask import request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # Initiating app
 app = Flask(__name__)
@@ -11,8 +13,16 @@ load_dotenv()
 
 app.secret_key = os.getenv('SECRET_TOKEN')
 
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=['200 per day', '50 per hour'],
+    storage_uri="memory://"
+)
+
 
 @app.route('/login', methods=['POST'])
+@limiter.limit('3/day')
 def LOGIN():
     response = login(request.get_json()['password'])
     if not response:
