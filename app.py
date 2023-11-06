@@ -5,9 +5,11 @@ from dotenv import load_dotenv
 from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import asyncio
 
 from Service.authentication import login, logout
 from Middleware.middleware import authentication_middleware
+from Repository.repo import create_new_image
 
 # Initiating app
 app = Flask(__name__)
@@ -46,7 +48,12 @@ def LOG_OUT():
 @app.route('/container/create', methods=['POST'])
 @authentication_middleware
 def POST_CREATE_CONTAINER():
-    return {'message': 'NOT IMPLEMENTED'}, 501
+    result = create_new_image(request.get_json()['url'], request.get_json()['name'])
+    if not result[0]:
+        return {'message': result[1]}, 500
+    else:
+        return {'message': 'Created container successfully'}, 201
+
 
 
 ## Check status

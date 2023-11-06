@@ -4,6 +4,7 @@ from typing import Final
 import uuid
 
 # Constant to make sure it won't be changed
+# TODO: In future use hashing
 ADMIN_PASSWORD: Final[str] = os.getenv('PASSWORD')
 
 

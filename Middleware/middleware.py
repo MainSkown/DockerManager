@@ -11,7 +11,8 @@ def authentication_middleware(func):
                 return {'message': 'NOT ALLOWED'}, 401
             else:
                 return func(*args, **kwargs)
-        except:
-            return {'message': 'NOT ALLOWED'}, 401
+        except Exception as exc:
+            print('Exception happened', exc)
+            return {'message': 'Internal Server Error'}, 500
 
     return _authenticate_middleware
