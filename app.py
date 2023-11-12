@@ -9,7 +9,7 @@ import asyncio
 
 from Service.authentication import login, logout
 from Middleware.middleware import authentication_middleware
-from Repository.repo import create_new_image
+from Repository.repo import create_new_container
 
 # Initiating app
 app = Flask(__name__)
@@ -48,7 +48,7 @@ def LOG_OUT():
 @app.route('/container/create', methods=['POST'])
 @authentication_middleware
 def POST_CREATE_CONTAINER():
-    result = create_new_image(request.get_json()['url'], request.get_json()['name'])
+    result = create_new_container(request.get_json()['url'], request.get_json()['name'])
     if not result[0]:
         return {'message': result[1]}, 500
     else:
