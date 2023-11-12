@@ -1,6 +1,7 @@
 import os
 
-from flask import Flask
+import docker.errors
+from flask import Flask, jsonify
 from dotenv import load_dotenv
 from flask import request
 from flask_limiter import Limiter
@@ -9,7 +10,8 @@ import asyncio
 
 from Service.authentication import login, logout
 from Middleware.middleware import authentication_middleware
-from Repository.repo import create_new_container
+from Repository.repo import create_new_container, get_all_info, get_status, turn_on, turn_off
+from Repository.repo import AlreadyRunning, AlreadyDead
 
 # Initiating app
 app = Flask(__name__)
@@ -55,41 +57,58 @@ def POST_CREATE_CONTAINER():
         return {'message': 'Created container successfully'}, 201
 
 
-
 ## Check status
-# id -> container id
-@app.route('/container/status/<string:id>', methods=['GET'])
+@app.route('/container/status/<string:container_id>', methods=['GET'])
 @authentication_middleware
-def GET_STATUS(id):
-    return {'message': 'NOT IMPLEMENTED'}, 501
+def GET_STATUS(container_id):
+    try:
+        return {'status': get_status(container_id)}, 200
+    except docker.errors.NotFound:
+        return {'message': 'Not found'}, 404
 
 
 ## Get all container info
 @app.route('/container/all', methods=['GET'])
 @authentication_middleware
 def GET_ALL():
-    return {'message': 'NOT IMPLEMENTED'}, 501
+    containerStrings = get_all_info()
+    if len(containerStrings) == 0:
+        return {'message': 'There are no containers'}, 200
+    else:
+        return jsonify(containerStrings), 200
 
 
 ## Turn container on
-@app.route('/container/on/<string:id>', methods=['POST'])
+@app.route('/container/on/<string:container_id>', methods=['POST'])
 @authentication_middleware
-def POST_TURN_ON(id):
-    return {'message': 'NOT IMPLEMENTED'}, 501
+def POST_TURN_ON(container_id):
+    try:
+        result = turn_on(container_id)
+        if result:
+            return {'message': 'Successfully started container'}, 201
+        else:
+            return {'message': 'Could not start container'}, 500
+    except AlreadyRunning:
+        return {'message': 'Container is already running'}, 409
+    except docker.errors.NotFound:
+        return {'message': 'Container not found'}, 404
 
 
 ## Turn off
-@app.route('/container/off/<string:id>', methods=['POST'])
+@app.route('/container/off/<string:container_id>', methods=['POST'])
 @authentication_middleware
-def POST_TURN_OFF(id):
-    return {'message': 'NOT IMPLEMENTED'}, 501
+def POST_TURN_OFF(container_id):
+    try:
+        result = turn_off(container_id)
+        if result:
+            return {'message': 'Successfully stopped container'}, 201
+        else:
+            return {'message': 'Could not stop container'}, 500
+    except AlreadyDead:
+        return {'message': 'Container is already dead'}, 409
+    except docker.errors.NotFound:
+        return {'message': 'Container not found'}, 404
 
-
-## Change "always on" status
-@app.route('/container/always_on/<string:id>', methods=['POST'])
-@authentication_middleware
-def POST_ALWAYS_ON(id):
-    return {'message': 'NOT IMPLEMENTED'}, 501
 
 
 if __name__ == '__main__':

@@ -44,26 +44,41 @@ def create_new_container(git_url: str, name: str):
     return return_value
 
 
-def get_all_info():
-    raise NotImplemented()
-    # TODO: Implement getting all info
+def get_all_info() -> list[str]:
+    containers = client.containers.list(all=True)
+    result: list[str] = []
+
+    for container in containers:
+        result.append(f'Short ID: {container.short_id} Tag: {container.name} Status: {container.status}')
+
+    return result
 
 
-def get_status(id: str):
-    raise NotImplemented()
-    # TODO: Implement getting status
+def get_status(container_id: str) -> str:
+    return client.containers.get(container_id).status
 
 
-def turn_on(id: str):
-    raise NotImplemented()
-    # TODO: Implement turning on container
+class AlreadyRunning(Exception):
+    pass
 
 
-def turn_of(id: str):
-    raise NotImplemented()
-    # TODO: Implement turning off container
+def turn_on(container_id: str) -> bool:
+    container = client.containers.get(container_id)
+    if container.status == 'running':
+        raise AlreadyRunning()
+    else:
+        container.start()
+        return True
 
 
-def set_always_on(id: str):
-    raise NotImplemented()
-    # TODO: Implement setting always on
+class AlreadyDead(Exception):
+    pass
+
+
+def turn_off(container_id: str) -> bool:
+    container = client.containers.get(container_id)
+    if container.status != 'running':
+        raise AlreadyDead
+    else:
+        container.kill()
+        return True
