@@ -1,7 +1,10 @@
+from dotenv import load_dotenv
 from flask import make_response, session
 import os
 from typing import Final
 import uuid
+
+load_dotenv()
 
 # Constant to make sure it won't be changed
 # TODO: In future use hashing

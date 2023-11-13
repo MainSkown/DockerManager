@@ -29,7 +29,7 @@ def create_new_container(git_url: str, name: str):
                 client.images.build(path=f'{temp_dir.name}/{name}', tag=name)
 
             # Create container using downloaded image and run it
-            client.containers.run(name, detach=True)
+            client.containers.run(name, detach=True, name=name)
 
             return_value = [True, 'OK']
 

@@ -9,7 +9,6 @@ EXIST=0
 if [ `find ./ -name "Dockerfile"` ]; then
   EXIST=1
 fi
-tree
 
 exit "$EXIST"
 

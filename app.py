@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from flask import request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import asyncio
 
 from Service.authentication import login, logout
 from Middleware.middleware import authentication_middleware
@@ -108,7 +107,6 @@ def POST_TURN_OFF(container_id):
         return {'message': 'Container is already dead'}, 409
     except docker.errors.NotFound:
         return {'message': 'Container not found'}, 404
-
 
 
 if __name__ == '__main__':
